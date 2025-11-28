@@ -1,0 +1,1706 @@
+
+        // <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Attendance Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --success: #4ade80;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gray: #64748b;
+            --gradient-primary: linear-gradient(135deg, #4361ee, #3a0ca3);
+            --gradient-accent: linear-gradient(135deg, #4cc9f0, #4361ee);
+            --gradient-success: linear-gradient(135deg, #4ade80, #22c55e);
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4ff, #e2e8ff);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Navigation Bar with colorful lines */
+        nav {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 18px 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            z-index: 10;
+        }
+
+        .logo i {
+            font-size: 1.8rem;
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .nav-links li a:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .nav-links li a.active {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Colorful lines to fill empty spaces */
+        .menu-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .color-line {
+            position: absolute;
+            height: 100%;
+            width: 80px;
+            opacity: 0.15;
+            transform: skewX(-20deg);
+        }
+
+        .line-1 {
+            background: #4cc9f0;
+            left: -100px;
+            animation: slideLine 15s linear infinite;
+        }
+
+        .line-2 {
+            background: #4361ee;
+            left: -50px;
+            animation: slideLine 12s linear infinite;
+            animation-delay: 2s;
+        }
+
+        .line-3 {
+            background: #3a0ca3;
+            left: 0;
+            animation: slideLine 18s linear infinite;
+            animation-delay: 1s;
+        }
+
+        .line-4 {
+            background: #4ade80;
+            right: -100px;
+            animation: slideLineReverse 15s linear infinite;
+        }
+
+        .line-5 {
+            background: #f59e0b;
+            right: -50px;
+            animation: slideLineReverse 12s linear infinite;
+            animation-delay: 3s;
+        }
+
+        .line-6 {
+            background: #ef4444;
+            right: 0;
+            animation: slideLineReverse 18s linear infinite;
+            animation-delay: 2s;
+        }
+
+        @keyframes slideLine {
+            0% { transform: skewX(-20deg) translateX(-100px); }
+            100% { transform: skewX(-20deg) translateX(calc(100vw + 100px)); }
+        }
+
+        @keyframes slideLineReverse {
+            0% { transform: skewX(-20deg) translateX(100px); }
+            100% { transform: skewX(-20deg) translateX(calc(-100vw - 100px)); }
+        }
+
+        /* Page Header */
+        .page-header {
+            margin: 40px 0 30px;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            color: var(--secondary);
+            margin-bottom: 12px;
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-header p {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Card Styles */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .card-header i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            background: rgba(67, 97, 238, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .card-header h2 {
+            color: var(--secondary);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        /* Search and Sort Controls */
+        .controls-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 25px;
+            align-items: center;
+        }
+
+        .search-container {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .search-container label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-container input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .sort-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            border-radius: var(--radius);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        th, td {
+            padding: 12px 10px;
+            text-align: center;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        th {
+            background: var(--gradient-primary);
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        tr {
+            transition: background-color 0.2s ease;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* Checkbox styles for attendance */
+        .attendance-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--success);
+        }
+
+        .participation-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+
+        /* Status indicators */
+        .present {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .absent {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .participation {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Row highlighting based on absences */
+        .good-attendance {
+            border-left: 4px solid var(--success);
+        }
+
+        .warning-attendance {
+            border-left: 4px solid var(--warning);
+        }
+
+        .critical-attendance {
+            border-left: 4px solid var(--danger);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        label i {
+            color: var(--primary);
+        }
+
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .error {
+            color: var(--danger);
+            font-size: 14px;
+            margin-top: 6px;
+            display: none;
+            font-weight: 500;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 14px 28px;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--gradient-accent);
+        }
+
+        .btn-success {
+            background: var(--gradient-success);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: var(--radius);
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+            border-top: 4px solid var(--primary);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            height: 300px;
+            margin-top: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        /* Message Styles */
+        .message {
+            padding: 18px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            font-weight: 500;
+            border-left: 4px solid;
+        }
+
+        .message.success {
+            background: rgba(34, 197, 94, 0.1);
+            color: #166534;
+            border-left-color: var(--success);
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #991b1b;
+            border-left-color: var(--danger);
+        }
+
+        /* Status Message */
+        .status-message {
+            padding: 12px 15px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            font-weight: 500;
+            color: var(--dark);
+            text-align: center;
+            margin-top: 10px;
+            border-left: 4px solid var(--primary);
+        }
+
+        /* Page Sections */
+        .page-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Footer */
+        footer {
+            background: var(--gradient-primary);
+            color: white;
+            text-align: center;
+            padding: 24px 0;
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .footer-links a:hover {
+            opacity: 0.8;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .controls-container {
+                flex-direction: column;
+            }
+
+            .search-container {
+                min-width: 100%;
+            }
+
+            .sort-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav>
+        <div class="container">
+            <!-- Colorful lines -->
+            <div class="menu-lines">
+                <div class="color-line line-1"></div>
+                <div class="color-line line-2"></div>
+                <div class="color-line line-3"></div>
+                <div class="color-line line-4"></div>
+                <div class="color-line line-5"></div>
+                <div class="color-line line-6"></div>
+            </div>
+
+            <div class="navbar">
+                <div class="logo">
+                    <i class="fas fa-user-graduate"></i>
+                    <span>EduTrack</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#" class="nav-link active" data-page="home"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="#" class="nav-link" data-page="attendance"><i class="fas fa-list-check"></i> Attendance List</a></li>
+                    <li><a href="#" class="nav-link" data-page="add-student"><i class="fas fa-user-plus"></i> Add Student</a></li>
+                    <li><a href="#" class="nav-link" data-page="reports"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                    <li><a href="#" class="nav-link" data-page="logout"><i class="fas fa-right-from-bracket"></i> Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Home Page -->
+        <section id="home" class="page-section active">
+            <div class="page-header">
+                <h1>Student Attendance Management System</h1>
+                <p>Track and manage student attendance and participation with ease</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-gauge-high"></i>
+                    <h2>Welcome to EduTrack</h2>
+                </div>
+                <p>This system allows you to:</p>
+                <ul style="margin: 15px 0 15px 20px;">
+                    <li>View and manage student attendance records</li>
+                    <li>Add new students to the system</li>
+                    <li>Generate detailed attendance reports</li>
+                    <li>Track student participation</li>
+                </ul>
+                <p>Use the navigation menu above to access different system features.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <div class="stat-value" id="home-total-students">0</div>
+                    <div class="stat-label">Enrolled Students</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-user-check"></i>
+                    <div class="stat-value" id="home-present-students">0</div>
+                    <div class="stat-label">Present Today</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-chalkboard-user"></i>
+                    <div class="stat-value" id="home-participating-students">0</div>
+                    <div class="stat-label">Have Participated</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-star"></i>
+                    <div class="stat-value" id="home-excellent-students">0</div>
+                    <div class="stat-label">Excellent Attendance</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Attendance List Page -->
+        <section id="attendance" class="page-section">
+            <div class="page-header">
+                <h1>Student Attendance List</h1>
+                <p>View and manage student attendance records</p>
+            </div>
+            
+            <!-- Exercise 7: Search and Sort Controls -->
+            <div class="controls-container">
+                <div class="search-container">
+                    <label for="search">Search by Name:</label>
+                    <input type="text" id="search" placeholder="Enter first or last name...">
+                </div>
+                <div class="sort-buttons">
+                    <button id="sort-absence" class="btn btn-warning"><i class="fas fa-sort-amount-up"></i> Sort by Absences (Ascending)</button>
+                    <button id="sort-participation" class="btn btn-secondary"><i class="fas fa-sort-amount-down"></i> Sort by Participation (Descending)</button>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button id="show-report-btn" class="btn"><i class="fas fa-chart-pie"></i> Show Report</button>
+                <button id="highlight-excellent-btn" class="btn"><i class="fas fa-crown"></i> Highlight Excellent</button>
+                <button id="reset-colors-btn" class="btn btn-secondary"><i class="fas fa-rotate-left"></i> Reset</button>
+                <button id="save-attendance-btn" class="btn btn-success"><i class="fas fa-save"></i> Save Attendance</button>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-table-list"></i>
+                    <h2>Attendance Register</h2>
+                </div>
+                <div class="table-container">
+                    <table id="attendance-table">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Last Name</th>
+                                <th>First Name</th>
+                                <th>Course</th>
+                                <th colspan="2">Session 1</th>
+                                <th colspan="2">Session 2</th>
+                                <th colspan="2">Session 3</th>
+                                <th colspan="2">Session 4</th>
+                                <th colspan="2">Session 5</th>
+                                <th colspan="2">Session 6</th>
+                                <th>Absences</th>
+                                <th>Participations</th>
+                                <th>Message</th>
+                            </tr>
+                            <tr>
+                                <th colspan="4"></th>
+                                <th>Present</th>
+                                <th>Participated</th>
+                                <th>Present</th>
+                                <th>Participated</th>
+                                <th>Present</th>
+                                <th>Participated</th>
+                                <th>Present</th>
+                                <th>Participated</th>
+                                <th>Present</th>
+                                <th>Participated</th>
+                                <th>Present</th>
+                                <th>Participated</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Student data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Exercise 7: Status Message -->
+            <div class="status-message" id="status-message">
+                No sorting applied. Use the buttons above to sort the table.
+            </div>
+            
+            <div id="report-container" class="card" style="display: none;">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar"></i>
+                    <h2>Attendance Report</h2>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <div class="stat-value" id="total-students">0</div>
+                        <div class="stat-label">Total Students</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-user-check"></i>
+                        <div class="stat-value" id="present-students">0</div>
+                        <div class="stat-label">Present Students</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-chalkboard-user"></i>
+                        <div class="stat-value" id="participating-students">0</div>
+                        <div class="stat-label">Have Participated</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-user-clock"></i>
+                        <div class="stat-value" id="average-absences">0</div>
+                        <div class="stat-label">Avg. Absences</div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="attendance-chart"></canvas>
+                </div>
+            </div>
+        </section>
+        <!-- Add Student Page -->
+        <section id="add-student" class="page-section">
+            <div class="page-header">
+                <h1>Add New Student</h1>
+                <p>Add a new student to the attendance system</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-user-plus"></i>
+                    <h2>Registration Form</h2>
+                </div>
+                <form id="student-form">
+                    <div class="form-group">
+                        <label for="student-id"><i class="fas fa-id-card"></i> Student ID</label>
+                        <input type="text" id="student-id" name="student-id" placeholder="Enter student ID">
+                        <div class="error" id="student-id-error">Student ID must contain only numbers and cannot be empty.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="last-name"><i class="fas fa-user"></i> Last Name</label>
+                        <input type="text" id="last-name" name="last-name" placeholder="Enter last name">
+                        <div class="error" id="last-name-error">Last name must contain only letters and cannot be empty.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="first-name"><i class="fas fa-user"></i> First Name</label>
+                        <input type="text" id="first-name" name="first-name" placeholder="Enter first name">
+                        <div class="error" id="first-name-error">First name must contain only letters and cannot be empty.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="email" name="email" placeholder="Enter email address">
+                        <div class="error" id="email-error">Please enter a valid email address.</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="course"><i class="fas fa-book"></i> Course</label>
+                        <input type="text" id="course" name="course" placeholder="Enter course name">
+                        <div class="error" id="course-error">Course name cannot be empty.</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success"><i class="fas fa-user-plus"></i> Add Student</button>
+                </form>
+                
+                <div id="form-message" class="message"></div>
+            </div>
+        </section>
+
+        <!-- Reports Page -->
+        <section id="reports" class="page-section">
+            <div class="page-header">
+                <h1>Attendance Reports</h1>
+                <p>View detailed attendance statistics and analytics</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-chart-line"></i>
+                    <h2>Attendance Overview</h2>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <div class="stat-value" id="report-total-students">0</div>
+                        <div class="stat-label">Total Students</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-face-smile"></i>
+                        <div class="stat-value" id="good-attendance-count">0</div>
+                        <div class="stat-label">Good Attendance</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-face-meh"></i>
+                        <div class="stat-value" id="warning-attendance-count">0</div>
+                        <div class="stat-label">Warning</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-face-frown"></i>
+                        <div class="stat-value" id="critical-attendance-count">0</div>
+                        <div class="stat-label">Critical Attendance</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin: 30px 0 15px;">Attendance Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="attendance-distribution-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Logout Page -->
+        <section id="logout" class="page-section">
+            <div class="page-header">
+                <h1>Logout</h1>
+                <p>You have been successfully logged out</p>
+            </div>
+            
+            <div class="card" style="text-align: center;">
+                <div class="card-header">
+                    <i class="fas fa-right-from-bracket"></i>
+                    <h2>Thank you for using EduTrack</h2>
+                </div>
+                <p>You have been logged out of the system.</p>
+                <button class="btn" style="margin-top: 20px;"><i class="fas fa-right-to-bracket"></i> Login Again</button>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>© 2023 EduTrack - Student Attendance Management System</div>
+                <div class="footer-links">
+                    <a href="#"><i class="fas fa-shield-alt"></i> Privacy</a>
+                    <a href="#"><i class="fas fa-file-contract"></i> Terms</a>
+                    <a href="#"><i class="fas fa-headset"></i> Support</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Store students data - maintenant chargé depuis l'API
+    let students = [];
+
+    // DOM ready
+    $(document).ready(function() {
+        // Charger les données depuis l'API au démarrage
+        loadStudentsData();
+        
+        // Navigation functionality
+        $('.nav-link').on('click', function(e) {
+            e.preventDefault();
+            const targetPage = $(this).data('page');
+            
+            // Update active nav link
+            $('.nav-link').removeClass('active');
+            $(this).addClass('active');
+            
+            // Show target page
+            $('.page-section').removeClass('active');
+            $(`#${targetPage}`).addClass('active');
+            
+            // Update stats based on page
+            if (targetPage === 'home') {
+                updateHomeStats();
+            } else if (targetPage === 'attendance') {
+                loadAttendanceData();
+            } else if (targetPage === 'reports') {
+                loadReportsData();
+            }
+        });
+        
+        // Form validation and submission
+        $('#student-form').on('submit', function(e) {
+            e.preventDefault();
+            if (validateForm()) {
+                addStudentViaAPI();
+            }
+        });
+        
+        // Show report button
+        $('#show-report-btn').on('click', function() {
+            generateReport();
+            $('#report-container').slideDown();
+        });
+        
+        // Highlight excellent students
+        $('#highlight-excellent-btn').on('click', function() {
+            highlightExcellentStudents();
+        });
+        
+        // Reset colors
+        $('#reset-colors-btn').on('click', function() {
+            resetRowColors();
+        });
+        
+        // Save attendance button
+        $('#save-attendance-btn').on('click', function() {
+            saveAttendance();
+        });
+        
+        // Initialize charts on reports page when it becomes active
+        $('.nav-link[data-page="reports"]').on('click', function() {
+            setTimeout(loadReportsData, 100);
+        });
+
+        // Exercise 7: Search functionality
+        $('#search').on('input', function() {
+            const searchTerm = $(this).val().toLowerCase();
+            
+            if (searchTerm === '') {
+                // Show all rows if search is empty
+                $('#attendance-table tbody tr').show();
+            } else {
+                // Use filter to show only matching rows
+                $('#attendance-table tbody tr').hide().filter(function() {
+                    const lastName = $(this).find('td:nth-child(2)').text().toLowerCase();
+                    const firstName = $(this).find('td:nth-child(3)').text().toLowerCase();
+                    return lastName.includes(searchTerm) || firstName.includes(searchTerm);
+                }).show();
+            }
+        });
+        
+        // Exercise 7: Sort by absences (ascending)
+        $('#sort-absence').on('click', function() {
+            const rows = $('#attendance-table tbody tr').get();
+            
+            rows.sort(function(a, b) {
+                const aAbsences = parseInt($(a).find('td:nth-child(17)').text());
+                const bAbsences = parseInt($(b).find('td:nth-child(17)').text());
+                return aAbsences - bAbsences;
+            });
+            
+            // Re-append sorted rows
+            $.each(rows, function(index, row) {
+                $('#attendance-table tbody').append(row);
+            });
+            
+            // Update status message
+            $('#status-message').text('Currently sorted by absences (ascending)');
+        });
+        
+        // Exercise 7: Sort by participation (descending)
+        $('#sort-participation').on('click', function() {
+            const rows = $('#attendance-table tbody tr').get();
+            
+            rows.sort(function(a, b) {
+                const aParticipation = parseInt($(a).find('td:nth-child(18)').text());
+                const bParticipation = parseInt($(b).find('td:nth-child(18)').text());
+                return bParticipation - aParticipation;
+            });
+            
+            // Re-append sorted rows
+            $.each(rows, function(index, row) {
+                $('#attendance-table tbody').append(row);
+            });
+            
+            // Update status message
+            $('#status-message').text('Currently sorted by participation (descending)');
+        });
+    });
+
+    // Charger les données des étudiants depuis l'API
+    function loadStudentsData() {
+        $.ajax({
+            url: 'api/students.php',
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    students = response.data;
+                    updateHomeStats();
+                } else {
+                    console.error('Erreur API:', response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Erreur de chargement:', error);
+                // Fallback sur les données mockées si l'API échoue
+                loadMockData();
+            }
+        });
+    }
+
+    // Charger les données de présence depuis l'API - VERSION CORRIGÉE
+    function loadAttendanceData() {
+        $.ajax({
+            url: 'api/attendance.php',
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    console.log('Données API reçues:', response.data);
+                    
+                    // Transformer les données API pour correspondre à votre interface
+                    const formattedData = response.data.map(student => {
+                        // Pour l'instant, créer des sessions par défaut
+                        // Dans une vraie app, vous auriez les données de sessions réelles
+                        const sessions = [];
+                        const totalSessions = 6;
+                        
+                        for (let i = 0; i < totalSessions; i++) {
+                            // Simuler des données de présence basées sur les stats
+                            const isPresent = (i < (totalSessions - student.absences));
+                            const hasParticipated = (i < student.participations);
+                            
+                            sessions.push({
+                                present: isPresent,
+                                participated: hasParticipated
+                            });
+                        }
+                        
+                        return {
+                            id: student.id,
+                            lastName: student.lastName,
+                            firstName: student.firstName,
+                            course: student.course,
+                            email: student.email,
+                            sessions: sessions
+                        };
+                    });
+                    
+                    students = formattedData;
+                    renderAttendanceTable();
+                    
+                } else {
+                    console.error('Erreur API:', response.message);
+                    // Fallback sur données mockées
+                    loadMockAttendanceData();
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Erreur de chargement:', error);
+                // Fallback sur données mockées
+                loadMockAttendanceData();
+            }
+        });
+    }
+
+    // Fallback sur les données mockées si nécessaire
+    function loadMockData() {
+        const initialStudents = [
+            {
+                id: "1001",
+                lastName: "Smith",
+                firstName: "Emma",
+                course: "Mathematics",
+                sessions: [
+                    { present: true, participated: true },
+                    { present: true, participated: false },
+                    { present: false, participated: false },
+                    { present: false, participated: false },
+                    { present: false, participated: false },
+                    { present: false, participated: false }
+                ]
+            },
+            {
+                id: "1002",
+                lastName: "Johnson",
+                firstName: "Michael",
+                course: "Science",
+                sessions: [
+                    { present: true, participated: false },
+                    { present: true, participated: true },
+                    { present: true, participated: true },
+                    { present: true, participated: true },
+                    { present: true, participated: true },
+                    { present: true, participated: true }
+                ]
+            }
+        ];
+        students = initialStudents;
+        updateHomeStats();
+    }
+
+    // Données mockées pour la présence
+    function loadMockAttendanceData() {
+        const mockStudents = [
+            {
+                id: "1001",
+                lastName: "Smith",
+                firstName: "Emma",
+                course: "Mathematics",
+                sessions: [
+                    { present: true, participated: true },
+                    { present: true, participated: false },
+                    { present: false, participated: false },
+                    { present: true, participated: true },
+                    { present: false, participated: false },
+                    { present: true, participated: false }
+                ]
+            },
+            {
+                id: "1002",
+                lastName: "Johnson",
+                firstName: "Michael",
+                course: "Science",
+                sessions: [
+                    { present: true, participated: true },
+                    { present: true, participated: true },
+                    { present: true, participated: false },
+                    { present: true, participated: true },
+                    { present: true, participated: true },
+                    { present: false, participated: false }
+                ]
+            },
+            {
+                id: "1003",
+                lastName: "Williams",
+                firstName: "Sophia",
+                course: "History",
+                sessions: [
+                    { present: false, participated: false },
+                    { present: true, participated: false },
+                    { present: true, participated: true },
+                    { present: false, participated: false },
+                    { present: true, participated: false },
+                    { present: true, participated: true }
+                ]
+            }
+        ];
+        
+        students = mockStudents;
+        renderAttendanceTable();
+    }
+
+    // Render the attendance table - VERSION CORRIGÉE AVEC ÉVÉNEMENTS
+    function renderAttendanceTable() {
+        const tableBody = $('#attendance-table tbody');
+        tableBody.empty();
+        
+        console.log('Rendering table with', students.length, 'students');
+        
+        students.forEach((student, studentIndex) => {
+            const absences = calculateAbsences(student);
+            const participations = calculateParticipations(student);
+            const message = generateMessage(absences, participations);
+            const rowClass = getRowClass(absences);
+            
+            let sessionCells = '';
+            student.sessions.forEach((session, sessionIndex) => {
+                sessionCells += `
+                    <td>
+                        <input type="checkbox" class="attendance-checkbox" 
+                               data-student-index="${studentIndex}" data-session="${sessionIndex}" 
+                               ${session.present ? 'checked' : ''}>
+                    </td>
+                    <td>
+                        <input type="checkbox" class="participation-checkbox" 
+                               data-student-index="${studentIndex}" data-session="${sessionIndex}" 
+                               ${session.participated ? 'checked' : ''}>
+                    </td>
+                `;
+            });
+            
+            const row = `
+                <tr class="student-row ${rowClass}" data-id="${student.id}">
+                    <td>${student.id}</td>
+                    <td>${student.lastName}</td>
+                    <td>${student.firstName}</td>
+                    <td>${student.course}</td>
+                    ${sessionCells}
+                    <td class="absence-count">${absences}</td>
+                    <td class="participation-count">${participations}</td>
+                    <td class="attendance-message">${message}</td>
+                </tr>
+            `;
+            
+            tableBody.append(row);
+        });
+        
+        // ATTACHER LES ÉVÉNEMENTS IMMÉDIATEMENT APRÈS LE RENDU
+        attachCheckboxEvents();
+    }
+
+    // Fonction pour attacher les événements des cases à cocher
+    function attachCheckboxEvents() {
+        console.log('Attaching checkbox events...');
+        
+        // D'abord, supprimer tous les anciens événements
+        $('.attendance-checkbox').off('change');
+        $('.participation-checkbox').off('change');
+        
+        // Attacher les nouveaux événements
+        $('.attendance-checkbox').on('change', function() {
+            console.log('Attendance checkbox changed!');
+            updateAttendanceStatus(this);
+        });
+        
+        $('.participation-checkbox').on('change', function() {
+            console.log('Participation checkbox changed!');
+            updateAttendanceStatus(this);
+        });
+        
+        // Vérifier que les événements sont attachés
+        console.log('Attendance checkboxes:', $('.attendance-checkbox').length);
+        console.log('Participation checkboxes:', $('.participation-checkbox').length);
+        
+        // Add row hover and click functionality
+        $('.student-row').off('hover').hover(
+            function() {
+                $(this).css('background-color', '#f0f4ff');
+            },
+            function() {
+                $(this).css('background-color', '');
+            }
+        );
+        
+        $('.student-row').off('click').on('click', function() {
+            const studentId = $(this).data('id');
+            const student = students.find(s => s.id === studentId);
+            const absences = $(this).find('.absence-count').text();
+            alert(`Student: ${student?.firstName || ''} ${student?.lastName || ''}\nAbsences: ${absences}`);
+        });
+    }
+
+    // Update attendance status when checkboxes are changed - VERSION CORRIGÉE
+    function updateAttendanceStatus(checkbox) {
+        const studentIndex = $(checkbox).data('student-index');
+        const sessionIndex = $(checkbox).data('session');
+        const isAttendance = $(checkbox).hasClass('attendance-checkbox');
+        
+        console.log('Updating attendance:', {
+            studentIndex: studentIndex,
+            sessionIndex: sessionIndex,
+            isAttendance: isAttendance,
+            checked: checkbox.checked
+        });
+        
+        if (isAttendance) {
+            students[studentIndex].sessions[sessionIndex].present = checkbox.checked;
+        } else {
+            students[studentIndex].sessions[sessionIndex].participated = checkbox.checked;
+        }
+        
+        // Mettre à jour l'affichage de la ligne
+        updateStudentRow(studentIndex);
+        
+        // Afficher un message de confirmation
+        showTempMessage('Présence mise à jour!', 'success');
+    }
+
+    // Fonction pour afficher des messages temporaires
+    function showTempMessage(message, type) {
+        const tempDiv = $('<div class="message ' + type + '">' + message + '</div>');
+        $('#attendance-table').before(tempDiv);
+        
+        setTimeout(() => {
+            tempDiv.fadeOut(() => tempDiv.remove());
+        }, 2000);
+    }
+
+    // Update a specific student row
+    function updateStudentRow(studentIndex) {
+        const student = students[studentIndex];
+        const absences = calculateAbsences(student);
+        const participations = calculateParticipations(student);
+        const message = generateMessage(absences, participations);
+        const rowClass = getRowClass(absences);
+        
+        const row = $(`.student-row[data-id="${student.id}"]`);
+        row.removeClass('good-attendance warning-attendance critical-attendance');
+        row.addClass(rowClass);
+        
+        row.find('.absence-count').text(absences);
+        row.find('.participation-count').text(participations);
+        row.find('.attendance-message').text(message);
+    }
+
+    // Save attendance data
+    function saveAttendance() {
+        // Cette fonction enverrait les données à l'API en production
+        const message = $('#form-message');
+        message.removeClass('error').addClass('success');
+        message.text('Attendance data saved successfully! (Données sauvegardées localement)');
+        message.show();
+        
+        // Update home stats
+        updateHomeStats();
+        
+        // Hide message after 3 seconds
+        setTimeout(() => {
+            message.hide();
+        }, 3000);
+        
+        console.log('Attendance data would be saved to API');
+    }
+
+    // Calculate number of absences for a student
+    function calculateAbsences(student) {
+        return student.sessions ? student.sessions.filter(session => !session.present).length : 0;
+    }
+
+    // Calculate number of participations for a student
+    function calculateParticipations(student) {
+        return student.sessions ? student.sessions.filter(session => session.participated).length : 0;
+    }
+
+    // Generate message based on attendance and participation
+    function generateMessage(absences, participations) {
+        if (absences < 3) {
+            return participations >= 3 
+                ? "Good attendance – Excellent participation"
+                : "Good attendance – You need to participate more";
+        } else if (absences >= 3 && absences <= 4) {
+            return "Warning – attendance low – You need to participate more";
+        } else {
+            return "Excluded – too many absences – You need to participate more";
+        }
+    }
+
+    // Get row class based on absences
+    function getRowClass(absences) {
+        if (absences < 3) {
+            return "good-attendance";
+        } else if (absences >= 3 && absences <= 4) {
+            return "warning-attendance";
+        } else {
+            return "critical-attendance";
+        }
+    }
+
+    // Form validation
+    function validateForm() {
+        let isValid = true;
+        
+        // Student ID validation
+        const studentId = $('#student-id').val();
+        const studentIdError = $('#student-id-error');
+        if (!studentId || !/^\d+$/.test(studentId)) {
+            studentIdError.show();
+            isValid = false;
+        } else {
+            studentIdError.hide();
+        }
+        
+        // Last name validation
+        const lastName = $('#last-name').val();
+        const lastNameError = $('#last-name-error');
+        if (!lastName || !/^[a-zA-Z\s]+$/.test(lastName)) {
+            lastNameError.show();
+            isValid = false;
+        } else {
+            lastNameError.hide();
+        }
+        
+        // First name validation
+        const firstName = $('#first-name').val();
+        const firstNameError = $('#first-name-error');
+        if (!firstName || !/^[a-zA-Z\s]+$/.test(firstName)) {
+            firstNameError.show();
+            isValid = false;
+        } else {
+            firstNameError.hide();
+        }
+        
+        // Email validation
+        const email = $('#email').val();
+        const emailError = $('#email-error');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+            emailError.show();
+            isValid = false;
+        } else {
+            emailError.hide();
+        }
+        
+        // Course validation
+        const course = $('#course').val();
+        const courseError = $('#course-error');
+        if (!course) {
+            courseError.show();
+            isValid = false;
+        } else {
+            courseError.hide();
+        }
+        
+        return isValid;
+    }
+
+    // Add new student via API
+    function addStudentViaAPI() {
+        const studentId = $('#student-id').val();
+        const lastName = $('#last-name').val();
+        const firstName = $('#first-name').val();
+        const email = $('#email').val();
+        const course = $('#course').val();
+        
+        $.ajax({
+            url: 'api/students.php',
+            method: 'POST',
+            dataType: 'json',
+            data: JSON.stringify({
+                student_id: studentId,
+                first_name: firstName,
+                last_name: lastName,
+                email: email,
+                course: course,
+                group_id: 1
+            }),
+            contentType: 'application/json',
+            success: function(response) {
+                if (response.success) {
+                    // Show success message
+                    const message = $('#form-message');
+                    message.removeClass('error').addClass('success');
+                    message.text(`Student ${firstName} ${lastName} added successfully!`);
+                    message.show();
+                    
+                    // Reset form
+                    $('#student-form')[0].reset();
+                    
+                    // Reload students data
+                    loadStudentsData();
+                    
+                    // Hide message after 3 seconds
+                    setTimeout(() => {
+                        message.hide();
+                    }, 3000);
+                } else {
+                    showFormError(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                showFormError('Erreur lors de l\'ajout: ' + error);
+            }
+        });
+    }
+
+    function showFormError(errorMessage) {
+        const message = $('#form-message');
+        message.removeClass('success').addClass('error');
+        message.text(errorMessage);
+        message.show();
+        
+        setTimeout(() => {
+            message.hide();
+        }, 5000);
+    }
+
+    // Generate attendance report
+    function generateReport() {
+        // Utiliser les données chargées depuis l'API
+        const totalStudents = students.length;
+        const presentStudents = students.filter(student => 
+            student.sessions && student.sessions.some(session => session.present)
+        ).length;
+        const participatingStudents = students.filter(student => 
+            student.sessions && student.sessions.some(session => session.participated)
+        ).length;
+        const totalAbsences = students.reduce((sum, student) => 
+            sum + calculateAbsences(student), 0
+        );
+        const averageAbsences = totalStudents > 0 ? totalAbsences / totalStudents : 0;
+        
+        // Update report values
+        $('#total-students').text(totalStudents);
+        $('#present-students').text(presentStudents);
+        $('#participating-students').text(participatingStudents);
+        $('#average-absences').text(averageAbsences.toFixed(1));
+        
+        // Create chart
+        const ctx = document.getElementById('attendance-chart').getContext('2d');
+        if (window.attendanceChart) {
+            window.attendanceChart.destroy();
+        }
+        
+        window.attendanceChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Total Students', 'Present', 'Participations'],
+                datasets: [{
+                    label: 'Attendance Statistics',
+                    data: [totalStudents, presentStudents, participatingStudents],
+                    backgroundColor: [
+                        'rgba(67, 97, 238, 0.7)',
+                        'rgba(76, 201, 240, 0.7)',
+                        'rgba(58, 12, 163, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(67, 97, 238, 1)',
+                        'rgba(76, 201, 240, 1)',
+                        'rgba(58, 12, 163, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Charger les données des rapports
+    function loadReportsData() {
+        $.ajax({
+            url: 'api/reports.php',
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    updateReportsPage(response.data);
+                } else {
+                    console.error('Erreur API:', response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Erreur de chargement:', error);
+            }
+        });
+    }
+
+    // Update reports page with API data
+    function updateReportsPage(reportData) {
+        // Update stats
+        $('#report-total-students').text(reportData.totalStudents);
+        $('#good-attendance-count').text(reportData.attendanceDistribution.good);
+        $('#warning-attendance-count').text(reportData.attendanceDistribution.warning);
+        $('#critical-attendance-count').text(reportData.attendanceDistribution.critical);
+        
+        // Create distribution chart
+        const ctx = document.getElementById('attendance-distribution-chart').getContext('2d');
+        if (window.distributionChart) {
+            window.distributionChart.destroy();
+        }
+        
+        window.distributionChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['Good Attendance (<3 absences)', 'Warning (3-4 absences)', 'Critical (≥5 absences)'],
+                datasets: [{
+                    data: [
+                        reportData.attendanceDistribution.good,
+                        reportData.attendanceDistribution.warning,
+                        reportData.attendanceDistribution.critical
+                    ],
+                    backgroundColor: [
+                        'rgba(76, 201, 240, 0.7)',
+                        'rgba(245, 158, 11, 0.7)',
+                        'rgba(239, 68, 68, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(76, 201, 240, 1)',
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(239, 68, 68, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+
+    // Highlight excellent students (fewer than 3 absences)
+    function highlightExcellentStudents() {
+        $('.student-row').each(function() {
+            const absences = parseInt($(this).find('.absence-count').text());
+            if (absences < 3) {
+                $(this).css('background-color', 'rgba(76, 201, 240, 0.3)');
+                $(this).animate({
+                    backgroundColor: 'rgba(76, 201, 240, 0.6)'
+                }, 1000);
+            }
+        });
+    }
+
+    // Reset row colors to original based on absences
+    function resetRowColors() {
+        $('.student-row').each(function() {
+            $(this).css('background-color', '');
+        });
+    }
+
+    // Update home page statistics
+    function updateHomeStats() {
+        const totalStudents = students.length;
+        const presentStudents = students.filter(student => 
+            student.sessions && student.sessions[0] && student.sessions[0].present
+        ).length;
+        const participatingStudents = students.filter(student => 
+            student.sessions && student.sessions[0] && student.sessions[0].participated
+        ).length;
+        const excellentStudents = students.filter(student => 
+            calculateAbsences(student) < 3
+        ).length;
+        
+        $('#home-total-students').text(totalStudents);
+        $('#home-present-students').text(presentStudents);
+        $('#home-participating-students').text(participatingStudents);
+        $('#home-excellent-students').text(excellentStudents);
+    }
+</script>
+               // Reload students data
+                    loadStudentsData();
+
+    
+</body>
+</html>
