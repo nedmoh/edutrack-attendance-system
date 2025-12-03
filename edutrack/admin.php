@@ -398,7 +398,7 @@ try {
                         <!-- Formulaire d'ajout -->
                         <div id="addStudentForm" style="display: none; background: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                             <h4>Nouvel Étudiant</h4>
-                            <form method="POST" action="?action=students">
+                            <form method="POST" action="?action=add_student">
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                                     <div class="form-group">
                                         <label>ID Étudiant</label>
@@ -478,7 +478,7 @@ try {
                         <!-- Formulaire création session -->
                         <div id="addSessionForm" style="display: none; background: #f8fafc; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
                             <h4>Nouvelle Session</h4>
-                            <form method="POST" action="?action=sessions">
+                            <form method="POST" action="?action=create_session">
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                                     <div class="form-group">
                                         <label>Nom du Cours</label>
