@@ -1,4 +1,4 @@
-<<?php
+<?php
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT');
@@ -28,7 +28,7 @@ try {
                 FROM students s
                 LEFT JOIN groups g ON s.group_id = g.id
                 LEFT JOIN attendance_records ar ON s.student_id = ar.student_id
-                GROUP BY s.student_id
+                GROUP BY s.id
                 ORDER BY s.last_name, s.first_name
             ");
             $attendance = $stmt->fetchAll();
