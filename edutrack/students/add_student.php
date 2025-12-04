@@ -1,27 +1,57 @@
 <?php
+require_once '../config/db_connect.php';
+
+$message = null;
+$message_type = null;
+$attendance_link = null;
+$groups = [];
+
+try {
+    $pdo = connectDB();
+    $groups = $pdo->query("SELECT * FROM groups ORDER BY id")->fetchAll();
+} catch (Exception $e) {
+    $groups = [];
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Traitement du formulaire d'ajout d'étudiant
-    require_once '../config/db_connect.php';
-    
     $student_id = $_POST['student_id'] ?? '';
     $first_name = $_POST['first_name'] ?? '';
     $last_name = $_POST['last_name'] ?? '';
     $email = $_POST['email'] ?? '';
     $course = $_POST['course'] ?? '';
-    
+    $group_id = $_POST['group_id'] ?? 1;
+
     try {
         $pdo = connectDB();
-        
-        $stmt = $pdo->prepare("
-            INSERT INTO students (student_id, first_name, last_name, email, course, group_id) 
-            VALUES (?, ?, ?, ?, ?, 1)
-        ");
-        
-        $stmt->execute([$student_id, $first_name, $last_name, $email, $course]);
-        
+
+        $stmt = $pdo->prepare(
+            "INSERT INTO students (student_id, first_name, last_name, email, course, group_id) VALUES (?, ?, ?, ?, ?, ?)"
+        );
+
+        $stmt->execute([$student_id, $first_name, $last_name, $email, $course, $group_id]);
+
         $message = "✅ Étudiant $first_name $last_name ajouté avec succès!";
         $message_type = "success";
-        
+
+        // Try to find an open session for this group so the user can verify attendance
+        try {
+            $sess_stmt = $pdo->prepare("SELECT id FROM attendance_sessions WHERE group_id = ? AND status = 'open' ORDER BY session_date DESC LIMIT 1");
+            $sess_stmt->execute([$group_id]);
+            $sess_row = $sess_stmt->fetch(PDO::FETCH_ASSOC);
+                if ($sess_row && isset($sess_row['id'])) {
+                    // attendance page is one level up from students/
+                    $attendance_link = "../attendance/take_attendance.php?session_id=" . $sess_row['id'];
+                }
+                // If we found an attendance page, redirect immediately so the user can verify the student
+                if (!empty($attendance_link)) {
+                    header('Location: ' . $attendance_link);
+                    exit;
+                }
+        } catch (Exception $e) {
+            // ignore — link is optional
+        }
+
     } catch(PDOException $e) {
         $message = "❌ Erreur: " . $e->getMessage();
         $message_type = "error";
@@ -92,6 +122,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if (isset($message)): ?>
             <div class="message <?php echo $message_type; ?>">
                 <?php echo $message; ?>
+                <?php if (!empty($attendance_link) && $message_type === 'success'): ?>
+                    <div style="margin-top:10px">
+                        <a href="<?php echo $attendance_link; ?>" class="btn" style="background:#10b981;">Voir la liste de présence (session)</a>
+                    </div>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
         
@@ -119,6 +154,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group">
                 <label for="course">Cours:</label>
                 <input type="text" id="course" name="course" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="group_id">Groupe:</label>
+                <select id="group_id" name="group_id" required>
+                    <?php if (!empty($groups)): ?>
+                        <?php foreach($groups as $g): ?>
+                            <option value="<?php echo $g['id']; ?>"><?php echo htmlspecialchars($g['name']); ?></option>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <option value="1">Groupe 1</option>
+                    <?php endif; ?>
+                </select>
             </div>
             
             <button type="submit" class="btn">Ajouter l'étudiant</button>
