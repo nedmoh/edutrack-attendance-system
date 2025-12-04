@@ -84,8 +84,17 @@ try {
             
         case 'take_attendance':
             $session_id = $_GET['session_id'] ?? 0;
-            $session = $pdo->query("SELECT * FROM attendance_sessions WHERE id = $session_id")->fetch();
-            $students = $pdo->query("SELECT * FROM students WHERE group_id = {$session['group_id']} ORDER BY last_name")->fetchAll();
+            $session_stmt = $pdo->prepare("SELECT * FROM attendance_sessions WHERE id = ?");
+            $session_stmt->execute([(int)$session_id]);
+            $session = $session_stmt->fetch();
+            
+            if ($session && $session['group_id']) {
+                $students_stmt = $pdo->prepare("SELECT * FROM students WHERE group_id = ? ORDER BY last_name");
+                $students_stmt->execute([$session['group_id']]);
+                $students = $students_stmt->fetchAll();
+            } else {
+                $students = [];
+            }
             break;
             
         case 'reports':
@@ -551,41 +560,82 @@ try {
                     <?php break; ?>
                     
                     <?php case 'take_attendance': ?>
-                        <h3>Prendre la Présence - <?php echo $session['course_name']; ?></h3>
-                        <p><strong>Date:</strong> <?php echo date('d/m/Y', strtotime($session['session_date'])); ?> | 
-                           <strong>Groupe:</strong> <?php echo $groups[$session['group_id']-1]['name'] ?? ''; ?></p>
+                        <h3>Prendre la Présence</h3>
                         
-                        <form method="POST" action="?action=take_attendance">
-                            <input type="hidden" name="session_id" value="<?php echo $session['id']; ?>">
+                        <?php if ($session && !empty($students)): ?>
+                            <p><strong>Date:</strong> <?php echo date('d/m/Y', strtotime($session['session_date'])); ?> | 
+                               <strong>Groupe:</strong> <?php echo $groups[$session['group_id']-1]['name'] ?? ''; ?></p>
+                            
+                            <form method="POST" action="?action=take_attendance">
+                                <input type="hidden" name="session_id" value="<?php echo $session['id']; ?>">
+                                
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nom</th>
+                                            <th>Prénom</th>
+                                            <th>Présent</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach($students as $student): ?>
+                                        <tr>
+                                            <td><?php echo $student['student_id']; ?></td>
+                                            <td><?php echo $student['last_name']; ?></td>
+                                            <td><?php echo $student['first_name']; ?></td>
+                                            <td>
+                                                <input type="checkbox" name="attendance[<?php echo $student['student_id']; ?>]" value="1" checked>
+                                            </td>
+                                        </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                                
+                                <button type="submit" class="btn" style="margin-top: 20px;">
+                                    <i class="fas fa-save"></i> Enregistrer la Présence
+                                </button>
+                                <a href="?action=sessions" class="btn btn-danger">Annuler</a>
+                            </form>
+                        <?php else: ?>
+                            <p style="color: #d97706; font-weight: bold;">Sélectionne une session ouverte dans la liste ci-dessous :</p>
                             
                             <table>
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Nom</th>
-                                        <th>Prénom</th>
-                                        <th>Présent</th>
+                                        <th>Cours</th>
+                                        <th>Groupe</th>
+                                        <th>Date</th>
+                                        <th>Professeur</th>
+                                        <th>Statut</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach($students as $student): ?>
+                                    <?php 
+                                    $all_sessions = $pdo->query("SELECT s.*, g.name as group_name FROM attendance_sessions s LEFT JOIN groups g ON s.group_id = g.id WHERE s.status = 'open' ORDER BY s.session_date DESC")->fetchAll();
+                                    foreach($all_sessions as $sess): 
+                                    ?>
                                     <tr>
-                                        <td><?php echo $student['student_id']; ?></td>
-                                        <td><?php echo $student['last_name']; ?></td>
-                                        <td><?php echo $student['first_name']; ?></td>
+                                        <td><?php echo $sess['id']; ?></td>
+                                        <td><?php echo $sess['course_name']; ?></td>
+                                        <td><?php echo $sess['group_name']; ?></td>
+                                        <td><?php echo date('d/m/Y', strtotime($sess['session_date'])); ?></td>
+                                        <td><?php echo $sess['opened_by']; ?></td>
+                                        <td><span style="color: #10b981;">🟢 Ouverte</span></td>
                                         <td>
-                                            <input type="checkbox" name="attendance[<?php echo $student['student_id']; ?>]" value="1" checked>
+                                            <a href="?action=take_attendance&session_id=<?php echo $sess['id']; ?>" class="btn btn-sm">Prendre présence</a>
                                         </td>
                                     </tr>
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
                             
-                            <button type="submit" class="btn" style="margin-top: 20px;">
-                                <i class="fas fa-save"></i> Enregistrer la Présence
-                            </button>
-                            <a href="?action=sessions" class="btn btn-danger">Annuler</a>
-                        </form>
+                            <p style="margin-top: 20px;">
+                                <a href="?action=sessions" class="btn btn-danger">Retour aux sessions</a>
+                            </p>
+                        <?php endif; ?>
                         
                     <?php break; ?>
                     
