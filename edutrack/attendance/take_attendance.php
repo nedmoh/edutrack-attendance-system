@@ -33,6 +33,8 @@ try {
     $students_stmt->execute([$session['group_id']]);
     $students = $students_stmt->fetchAll();
     
+    // no debug statements — normal operation
+    
 } catch(PDOException $e) {
     die("Erreur: " . $e->getMessage());
 }
@@ -162,22 +164,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="student-list">
                 <h3>Liste des étudiants</h3>
                 
-                <?php foreach($students as $student): ?>
-                <div class="student-item">
-                    <input type="checkbox" 
-                           class="attendance-checkbox" 
-                           name="attendance[<?php echo $student['id']; ?>]" 
-                           value="1" 
-                           id="student_<?php echo $student['id']; ?>">
-                    
-                    <div class="student-info">
-                        <label for="student_<?php echo $student['id']; ?>" style="cursor: pointer;">
-                            <strong><?php echo htmlspecialchars($student['last_name'] . ' ' . $student['first_name']); ?></strong>
-                            (ID: <?php echo htmlspecialchars($student['student_id']); ?>)
-                        </label>
+                <?php if (!empty($students)): ?>
+                    <?php foreach($students as $student): ?>
+                    <div class="student-item">
+                        <input type="checkbox" 
+                               class="attendance-checkbox" 
+                               name="attendance[<?php echo $student['id']; ?>]" 
+                               value="1" 
+                               id="student_<?php echo $student['id']; ?>">
+                        
+                        <div class="student-info">
+                            <label for="student_<?php echo $student['id']; ?>" style="cursor: pointer;">
+                                <strong><?php echo htmlspecialchars($student['last_name'] . ' ' . $student['first_name']); ?></strong>
+                                (ID: <?php echo htmlspecialchars($student['student_id']); ?>)
+                            </label>
+                        </div>
                     </div>
-                </div>
-                <?php endforeach; ?>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div style="padding: 15px; background: #fffbeb; border-radius: 6px; margin-bottom: 12px;">
+                        <strong>Aucun étudiant trouvé pour ce groupe.</strong>
+                        <p style="margin: 6px 0 0 0;">Vérifie que l'étudiant a bien été ajouté au même groupe que la session.</p>
+                    </div>
+                <?php endif; ?>
             </div>
             
             <button type="submit" class="btn">
